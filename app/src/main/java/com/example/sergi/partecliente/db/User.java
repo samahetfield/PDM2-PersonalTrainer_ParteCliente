@@ -13,11 +13,11 @@ import android.support.annotation.NonNull;
 public class User {
     @PrimaryKey
     @NonNull
+    public String usuario;
+
     public String nombre;
 
     public String apellidos;
-
-    public String usuario;
 
     public String password;
 

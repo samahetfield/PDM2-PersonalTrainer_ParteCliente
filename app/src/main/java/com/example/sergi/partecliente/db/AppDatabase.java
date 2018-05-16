@@ -17,6 +17,14 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract RutinaDao rutModel();
 
+    public static AppDatabase getDatabase(Context context){
+        if(INSTANCE == null){
+            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "personal_trainer").allowMainThreadQueries().build();
+        }
+
+        return INSTANCE;
+    }
+
     public static AppDatabase getInMemoryDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =

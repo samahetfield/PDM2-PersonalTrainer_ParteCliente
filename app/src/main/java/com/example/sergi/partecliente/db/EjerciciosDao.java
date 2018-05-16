@@ -4,6 +4,8 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
+import java.util.List;
+
 import static android.arch.persistence.room.OnConflictStrategy.IGNORE;
 
 /**
@@ -17,4 +19,10 @@ public interface EjerciciosDao {
 
     @Query("DELETE FROM Ejercicios")
     void deleteAll();
+
+    @Query("SELECT imagen from EJERCICIOS WHERE id_ejercicio == :ejercicio")
+    String getImageName(String ejercicio);
+
+    @Query("SELECT nombre FROM Ejercicios WHERE id_ejercicio == :ejercicio")
+    String getNombreEjer(String ejercicio);
 }
