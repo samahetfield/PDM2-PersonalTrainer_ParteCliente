@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
             createNotification(contador_ejercicio, rut);
         }
 
-        contador_ejercicio++;
-
     }
 
     protected void pasaEjer(View v){
