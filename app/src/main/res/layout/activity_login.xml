@@ -24,6 +24,7 @@
         android:orientation="vertical">
         <EditText
             android:id="@+id/user_in"
+            android:text="marcol"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginBottom="16dp"
@@ -32,6 +33,7 @@
 
         <EditText
             android:id="@+id/pass_in"
+            android:text="prueba"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:inputType="textPassword"

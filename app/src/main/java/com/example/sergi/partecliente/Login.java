@@ -41,11 +41,9 @@ public class Login extends AppCompatActivity {
         password = (EditText) findViewById(R.id.pass_in);
         sesion_activa = (CheckBox) findViewById(R.id.sesion_activa);
 
-        mDb = AppDatabase.getDatabase(getApplicationContext());
+        mDb = AppDatabase.getInMemoryDatabase(getApplicationContext());
 
-        if (bd_create != "bdcreada") {
-            DatabaseInitializer.populateSync(mDb);
-        }
+        DatabaseInitializer.populateSync(mDb);
 
         if(us_save != ""){
             Intent in = new Intent(getApplicationContext(), MainActivity.class);

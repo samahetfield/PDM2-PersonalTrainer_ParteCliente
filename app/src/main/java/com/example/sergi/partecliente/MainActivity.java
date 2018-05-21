@@ -9,6 +9,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,17 +34,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDb = AppDatabase.getDatabase(getApplicationContext());
+        mDb = AppDatabase.getInMemoryDatabase(getApplicationContext());
+
+        DatabaseInitializer.populateSync(mDb);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         user_connected = extras.getString("USER");
 
-        if (extras.getString("action") == "PasaEjer"){
-            pasaEjer(new View(getApplicationContext()));
-        }
-        else if (extras.getString("action") == "AnteriorEjer"){
-            anteriorEjer(new View(getApplicationContext()));
+        if(intent.hasExtra("action")){
+            if (extras.getString("action").equals("PasaEjer")){
+                pasaEjer(new View(getApplicationContext()));
+            }
+            else if (extras.getString("action").equals("AnteriorEjer")){
+                anteriorEjer(new View(getApplicationContext()));
+            }
         }
         else{
             List<Rutina> rutina = mDb.rutModel().getRutinasFromUser(user_connected);
@@ -66,6 +71,47 @@ public class MainActivity extends AppCompatActivity {
             createNotification(contador_ejercicio, rut);
         }
 
+/*
+        if (extras.getString("action") == "PasaEjer"){
+            Log.e("Error", "aasdasd");
+
+            //pasaEjer(new View(getApplicationContext()));
+            TextView series = (TextView) findViewById(R.id.num_series);
+            series.setText("asdfasdfasdfasdfasdfasdfasdf");
+
+        }
+        else if (extras.getString("action") == "AnteriorEjer"){
+            //anteriorEjer(new View(getApplicationContext()));
+            TextView series = (TextView) findViewById(R.id.num_series);
+            series.setText("asdfasdfasdfasdfasdfasdfasdf");
+        }
+        else{
+            List<Rutina> rutina = mDb.rutModel().getRutinasFromUser(user_connected);
+
+            Rutina rut = rutina.get(contador_ejercicio%rutina.size());
+            String ejer = rut.id_ejercicio;
+
+            String imagename = mDb.ejerModel().getImageName(ejer);
+
+            ImageView image = (ImageView) findViewById(R.id.image_ej);
+
+            int id = getResources().getIdentifier(imagename, "mipmap", getPackageName());
+            image.setImageResource(id);
+
+            TextView series = (TextView) findViewById(R.id.num_series);
+            series.setText(rut.series);
+            TextView repes = (TextView) findViewById(R.id.num_repeticiones);
+            repes.setText(rut.repeticiones);
+
+            createNotification(contador_ejercicio, rut);
+        }
+*/
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        //setIntent(intent);
     }
 
     protected void pasaEjer(View v){
@@ -92,43 +138,46 @@ public class MainActivity extends AppCompatActivity {
     public void createNotification(int contador, Rutina rut){
         String data = "Series: " + rut.series +" Repeticiones: " + rut.repeticiones;
         int notificationID = 0;
+
         Intent nextExe = new Intent(getApplicationContext(), MainActivity.class);
+        nextExe.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_SINGLE_TOP);
         Bundle extras_next = new Bundle();
         extras_next.putString("action", "PasaEjer");
         extras_next.putString("USER", user_connected);
         nextExe.putExtras(extras_next);
 
+        /*
         Intent antEjer = new Intent(getApplicationContext(), MainActivity.class);
         Bundle extras_ant = new Bundle();
         extras_ant.putString("action", "AnteriorEjer");
         extras_ant.putString("USER", user_connected);
         antEjer.putExtras(extras_ant);
-
+*/
         String nombre_ejer = mDb.ejerModel().getNombreEjer(rut.id_ejercicio);
 
-        PendingIntent pasaEjercicio = PendingIntent.getBroadcast(this, 0,
+        PendingIntent pasaEjercicio = PendingIntent.getActivity(this, 0,
                 nextExe, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent vuelveEje = PendingIntent.getBroadcast(this, 0,
-                antEjer, PendingIntent.FLAG_UPDATE_CURRENT);
-
+/*
+        PendingIntent vuelveEje = PendingIntent.getActivity(this, 0,
+                antEjer, 0);
+*/
         NotificationCompat.Action pasarEjercicio =
                 new NotificationCompat.Action.Builder(R.mipmap.ic_launcher, "Siguiente ejercicio",
                         pasaEjercicio)
                         .build();
-
+/*
         NotificationCompat.Action volverEjercicio =
                 new NotificationCompat.Action.Builder(R.mipmap.ic_launcher, "Ejercicio anterior",
                         vuelveEje)
                         .build();
-
+*/
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(nombre_ejer)
                         .setContentText(data)
-                        .addAction(pasarEjercicio)
-                        .addAction(volverEjercicio);
+                        .addAction(pasarEjercicio);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
